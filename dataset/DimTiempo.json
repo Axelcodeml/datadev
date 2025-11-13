@@ -1,0 +1,24 @@
+{
+	"name": "DimTiempo",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorageMT",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "dimtiempo",
+				"container": "filesstorageesar"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

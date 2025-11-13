@@ -1,0 +1,9 @@
+{
+	"name": "MileniumDF",
+	"location": "centralus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "9a1bed74-fada-459b-83f8-7f51d50aa28b",
+		"tenantId": "340c5099-6ec2-4a50-964a-d072a7ff04a7"
+	}
+}

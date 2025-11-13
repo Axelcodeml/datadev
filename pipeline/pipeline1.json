@@ -1,0 +1,169 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data - Cursos",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.6:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": "SELECT curs_nombre, ocur_valor, ocur_fecha_inicio \nFROM cap.curso as curs\nLEFT JOIN cap.ofertacapacitacion as ofca\nON curs.curs_id = ofca.curs_id \nLEFT JOIN cap.ofertacursos as ocur\nON ofca.ofca_id = ocur.ofca_id\nWHERE ocur.ocur_fecha_inicio >= '2025-01-01'\nORDER BY ocur.ocur_fecha_inicio ASC;",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzurePostgreSqlTable1",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DimCurso",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy data - Estudiantes",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.6:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": "SELECT \n\tpers_nombres, pers_apellidos, pers_correo_electronico, matr_fecha_registro,\n  CASE pers_ciudad\n    WHEN 229 THEN 'Quito'\n    WHEN 223 THEN 'Ruminahui'\n    WHEN 212 THEN 'El Chaco'\n\tWHEN 87 THEN 'Latacunga'\n\tWHEN 77 THEN 'Riobamba'\t\n\tWHEN 247 THEN 'Ambato'\n\tWHEN 228 THEN 'Mejia'\t\n    ELSE 'Desconocido'\n  END AS ciudad\t\nFROM\n\tcap.persona as pers \nLEFT JOIN cap.estudiante as estu\n\tON pers.pers_id = estu.pers_id\nLEFT JOIN cap.matricula as matr\n\tON estu.estu_id = matr.estu_id\nWHERE matr.matr_fecha_registro >= '2025-01-01'\nORDER BY matr.matr_fecha_registro ASC",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzurePostgreSqlTable1",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DimEstudiante",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy data - Tiempo",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.6:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": "SELECT matr_fecha_registro\nFROM\n\tcap.persona as pers \nLEFT JOIN cap.estudiante as estu\n\tON pers.pers_id = estu.pers_id\nLEFT JOIN cap.matricula as matr\n\tON estu.estu_id = matr.estu_id\nWHERE matr.matr_fecha_registro >= '2025-01-01'\nORDER BY matr.matr_fecha_registro ASC;",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzurePostgreSqlTable1",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DimTiempo",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-11-13T02:22:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
